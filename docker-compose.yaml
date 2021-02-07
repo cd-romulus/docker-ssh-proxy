@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  sshproxy:
+    build:
+      context: ./
+    restart: unless-stopped
+    environment:
+      - ACCEPT_FINGERPRINT=yes # if this variable is set to any value, the fingerprint is not checkt. To achieve proper fingerprint checking supply a known_hosts file under /home/proxyuser/.ssh
+      - LOCAL_PORT=80
+      - FORWARDED_HOST=www.example.com
+      - FORWARDED_PORT=80
+      - CONNECTION_STRING=me@tunnel-host.example.com
+    secrets:                    
+     - source: my_ssh_key
+       target: ssh_key
+       uid: '1000'
+       gid: '1000'
+       mode: 0600
+    ports:
+      - 8080:80
+
+secrets:                        
+  my_ssh_key:
+    file: ~/.ssh/my_ssh_key
